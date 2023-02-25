@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,8 +14,10 @@ namespace JavascriptComponent.Sample
 
         public ChartInterop(IJSRuntime jsRuntime)
         {
-            moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
-              "import", "./_content/JavascriptComponent.Sample/chartScript.js").AsTask());
+            string projectName = Assembly.GetCallingAssembly().GetName().Name;
+
+            moduleTask = new (() => jsRuntime.InvokeAsync<IJSObjectReference>(
+              "import", $"./_content/{projectName}/chartScript.js").AsTask());
         }
 
         public async ValueTask ShowChart()
