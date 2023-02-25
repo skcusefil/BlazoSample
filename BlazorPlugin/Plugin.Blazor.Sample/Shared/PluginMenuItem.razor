@@ -1,0 +1,12 @@
+﻿<NavLink class="nav-link" href="@PageLink">
+    <span class="oi oi-list-rich" aria-hidden="true"></span> @MenuText
+</NavLink>
+
+@code {
+
+    [Parameter]
+    public string PageLink { get; set; }
+    [Parameter]
+    public string MenuText { get; set; }
+
+}

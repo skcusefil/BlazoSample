@@ -1,0 +1,21 @@
+﻿@page "/{PluginPageLink}"
+@using Plugin.Shared;
+
+<DynamicComponent Type="@PluginComponent.ComponentType" Parameters="@PluginComponent.ComponentParameters"></DynamicComponent>
+
+@code {
+    IPluginComponent PluginComponent;
+
+    [Parameter]
+    public string PluginPageLink { get; set; }
+
+    [Inject]
+    IPluginService PluginService { get; set; }
+
+    protected override void OnInitialized()
+    {
+        PluginComponent = PluginService.GetComponentByPageName(PluginPageLink);
+        base.OnInitialized();
+    }
+
+}
