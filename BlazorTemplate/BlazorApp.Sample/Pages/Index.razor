@@ -1,0 +1,76 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+<div style="display:flex; flex-direction:row; ">
+    <div style="width:50%;padding:20px;">
+        <div style="margin-bottom:20px;">Sample Form 1</div>
+        <BlazorFormTemplate.FormTemplate TItem="MyForm1" Data="Data1" OnSubmit=SubmitForm1></BlazorFormTemplate.FormTemplate>
+        @if (isForm1Submit)
+        {
+            <div>
+                Here is data from form 1 <br />
+                @Data1.Name @Data1.Age @Data1.DateTime
+            </div>
+        }
+    </div>
+    <div style="width:50%; padding:20px;">
+        <div style="margin-bottom:20px;">Sample Form 2</div>
+        <BlazorFormTemplate.FormTemplate TItem="MyForm2" Data="Data2" OnSubmit=SubmitForm2></BlazorFormTemplate.FormTemplate>
+        @if (isForm2Submit)
+        {
+            <div>
+                Here is data from form 2 <br />
+                @Data2.SomeText @Data2.SomeAnotherText @Data2.SomeNumber @Data2.SomeDateTime
+            </div>
+        }
+    </div>
+</div>
+
+
+@code {
+
+    class MyForm1
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public DateTime DateTime { get; set; }
+    }
+
+    class MyForm2
+    {
+        public string SomeText { get; set; }
+        public string SomeAnotherText { get; set; }
+        public int SomeNumber { get; set; }
+        public DateTime SomeDateTime { get; set; }
+    }
+
+    private MyForm1 Data1 = new MyForm1();
+    private MyForm2 Data2 = new MyForm2();
+    private bool isForm1Submit = false;
+    private bool isForm2Submit = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    private void SubmitForm1(MyForm1 form1)
+    {
+        isForm1Submit = true;
+        Data1 = form1;
+    }
+
+    private void SubmitForm2(MyForm2 form2)
+    {
+        isForm2Submit = true;
+        Data2 = form2;
+    }
+
+}

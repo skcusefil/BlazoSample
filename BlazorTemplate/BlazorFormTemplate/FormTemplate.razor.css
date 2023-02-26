@@ -1,0 +1,39 @@
+﻿.jira-ft-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 25px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 2px 5px;
+    gap: 25px;
+}
+
+.jira-ft {
+    display: flex;
+    flex-direction: column;
+}
+
+    .jira-ft input {
+        border-radius: 10px;
+        padding: 10px;
+        border: 1px solid gray;
+        box-sizing: border-box;
+    }
+
+        .jira-ft input:focus {
+            outline: none;
+            box-sizing: border-box;
+            border: 2px solid green;
+        }
+
+.jira-btn {
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 400;
+    font-size: 18px;
+}
+
+.jira-btn-success {
+    background-color: green;
+    color: white;
+}

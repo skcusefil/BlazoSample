@@ -1,0 +1,106 @@
+﻿@typeparam TItem
+
+<div class="jira-ft-container">
+    @if (PropertiesValues.Count() > 0)
+    {
+        @foreach (var prop in PropertiesValues)
+        {
+            var type = prop.Value.GetType();
+            var inputType = "";
+
+            if (type == typeof(string))
+            {
+                inputType = "text";
+            }
+            else if (type == typeof(int))
+            {
+                inputType = "number";
+
+            }
+            else if (type == typeof(DateTime))
+            {
+                inputType = "datetime-local";
+
+            }
+            <div class="jira-ft">
+                <label for="first_name">@prop.Key</label>
+                <input type="@inputType"
+               id="@prop.Key.ToLower()"
+               value=@GetValue(prop.Key)
+               @oninput=@((e) => InputChanged(e,prop.Key))>
+            </div>
+        }
+
+        <button class="jira-btn jira-btn-success" @onclick=@(() => OnSubmit.InvokeAsync(Data))>Submit</button>
+
+    }
+</div>
+
+@code {
+    [Parameter]
+    public TItem Data { get; set; }
+
+    private string test = "";
+
+    [Parameter]
+    public EventCallback<TItem> OnSubmit { get; set; }
+
+    [Parameter]
+    public EventCallback<TItem> OnChanged { get; set; }
+
+    private Dictionary<string, object> PropertiesValues = new Dictionary<string, object>();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        foreach (var prop in Data.GetType().GetProperties())
+        {
+            var value = GetPropValue(Data, prop.Name);
+            object newVal = new object();
+            SetValue(prop.PropertyType, value as string, out newVal);
+            PropertiesValues.Add(prop.Name, newVal);
+        }
+    }
+
+    private object GetPropValue(object src, string propName)
+    {
+        return src.GetType().GetProperty(propName).GetValue(src, null);
+    }
+
+    private object GetValue(string propName)
+    {
+        return PropertiesValues[propName];
+    }
+
+    private async void InputChanged(ChangeEventArgs e, string propName)
+    {
+
+        var type = Data.GetType().GetProperty(propName).PropertyType;
+        object value = new object();
+        var dataValue = e.Value as string;
+        SetValue(type,dataValue, out value);
+
+        Data.GetType().GetProperty(propName).SetValue(Data, value);
+
+        OnChanged.InvokeAsync(Data);
+
+    }
+
+    private void SetValue(Type type, string propValue,out object value)
+    {
+        if (type == typeof(int))
+        {
+            value = propValue == null ? 0 : int.Parse(propValue);
+        }
+        else if (type == typeof(DateTime))
+        {
+            value = propValue == null ? DateTime.MinValue : DateTime.Parse(propValue);
+        }
+        else
+        {
+            value = propValue == null ? "" : propValue;
+        }
+    }
+
+}
