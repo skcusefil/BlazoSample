@@ -1,0 +1,52 @@
+﻿@page "/"
+@using BlazorWasmAtuhSample.Auth;
+@using Microsoft.AspNetCore.Components.Authorization;
+@inject AuthenticationStateProvider AuthProvider
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+<button @onclick=Login>Login</button>
+<button @onclick=Logout>Logout</button>
+
+<AuthorizeView>
+    <Authorized>
+        @*ถ้าล็อคอิจจะแสดงชื่อผู้ใช้งาน*@
+        Hello, @context.User.Identity.Name
+    </Authorized>
+    <NotAuthorized>
+        @*ถ้าไม่ได้ล็อคอิจจะแสดงชื่อผู้ใช้งาน*@
+        Hello, Guest
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+
+    private async Task Login()
+    {
+        //ตัวอย่าง เป็นโมเดลล็อคอินง่ายๆ ในการทำงานจริงส่วนมากจะเรียกใช้ api 
+        var user = new AppUser()
+            {
+                UserId = 1,
+                UserName = "sampleuser",
+            };
+
+        var authenState = (AppAuthenticationState)AuthProvider;
+        authenState.UpdateAuthenticationState(user);
+
+    }
+
+    private async Task Logout()
+    {
+        var authenState = (AppAuthenticationState)AuthProvider;
+        //remove ผู้ใช้งานจากการ 
+        authenState.UpdateAuthenticationState(null);
+
+    }
+
+}
