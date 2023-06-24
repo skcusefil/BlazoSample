@@ -20,6 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+
 		<ProjectReference Include="..\Plugin.Shared\Plugin.Shared.csproj" />
 	</ItemGroup>
 
