@@ -1,6 +1,29 @@
 ﻿@page "/pluginSample"
+@using Newtonsoft.Json;
 <h3>PluginSample</h3>
 
+@JSon
+
 @code {
+
+    class Test
+    {
+        public int MyProperty { get; set; }
+        public string Str { get; set; }
+    }
+
+    string JSon = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var test = new Test()
+            {
+                MyProperty = 1,
+                Str = "somestring"
+            };
+
+       JSon = JsonConvert.SerializeObject(test);
+       await base.OnInitializedAsync();
+    }
 
 }

@@ -13,6 +13,7 @@ namespace Plugin.Shared
         public IEnumerable<Type> Components { get; private set; }
         public PluginService(string assemblyDir)
         {
+
             LoadComponents(assemblyDir);
         }
 
@@ -32,13 +33,19 @@ namespace Plugin.Shared
         //Load Components
         private void LoadComponents(string path)
         {
+
             var components = new List<Type>();
             var assemblies = LoadAssemblies(path);
 
             foreach (var asm in assemblies)
             {
-                var types = GetTypesWithInterface(asm);
-                foreach (var typ in types) components.Add(typ);
+                PluginLoadContext loadContext = new PluginLoadContext(asm.Location);
+                var assembly = loadContext.LoadFromAssemblyName(AssemblyName.GetAssemblyName(asm.Location));
+
+                var types = GetTypesWithInterface(assembly);
+
+                foreach (var plugin in types) components.Add(plugin);
+
             }
 
             Components = components;

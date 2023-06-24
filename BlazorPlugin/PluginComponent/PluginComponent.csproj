@@ -1,32 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<EnableDynamicLoading>true</EnableDynamicLoading>
+	</PropertyGroup>
 
 
-  <ItemGroup>
-    <SupportedPlatform Include="browser" />
-  </ItemGroup>
+	<ItemGroup>
+		<SupportedPlatform Include="browser" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.11" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.11" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" >
+			<IncludeAssets>all</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Plugin.Shared\Plugin.Shared.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Plugin.Shared\Plugin.Shared.csproj" />
+	</ItemGroup>
 
 	<Target Name="CreatePluginDir" AfterTargets="PrepareForBuild">
 		<MakeDir Directories="$(OutDir)Plugin" Condition="!Exists('$(OutDir)Plugin')" />
 	</Target>
 
 	<Target Name="CopyDLL" AfterTargets="AfterBuild">
-		<Exec Command="xcopy /y /d  $(OutDir)\$(ProjectName).dll $(OutDir)Plugin\" />
-		<Exec Command="xcopy /y /d  .\wwwroot\*.js  $(OutDir)Plugin\" />
+		<Exec Command="xcopy /y /d  $(OutDir)\$(ProjectName).dll $(OutDir)Plugin\$(ProjectName)\" />
+		<Exec Command="xcopy /y /d  wwwroot\**  $(OutDir)Plugin\$(ProjectName)\wwwroot\" />
+		<Exec Command="xcopy /y /d  $(OutDir)\Newtonsoft.Json.dll $(OutDir)Plugin\$(ProjectName)\" />
 	</Target>
 
 </Project>
-
