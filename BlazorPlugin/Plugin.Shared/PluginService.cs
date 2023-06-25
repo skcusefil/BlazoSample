@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Xml.Linq;
 
 namespace Plugin.Shared
@@ -13,8 +14,11 @@ namespace Plugin.Shared
         public IEnumerable<Type> Components { get; private set; }
         public PluginService(string assemblyDir)
         {
+            var rootDir = AppDomain.CurrentDomain.BaseDirectory;
+            string pluginDir = Directory.GetDirectories(rootDir).Where(x => x.Contains("Plugins")).FirstOrDefault();
 
-            LoadComponents(assemblyDir);
+            string[] pluginFolders = Directory.GetDirectories(pluginDir); 
+            LoadComponents(pluginDir);
         }
 
         public IEnumerable<IPluginComponent> GetComponents()
@@ -42,9 +46,10 @@ namespace Plugin.Shared
                 PluginLoadContext loadContext = new PluginLoadContext(asm.Location);
                 var assembly = loadContext.LoadFromAssemblyName(AssemblyName.GetAssemblyName(asm.Location));
 
-                var types = GetTypesWithInterface(assembly);
+                //var types = GetTypesWithInterface(assembly);
 
-                foreach (var plugin in types) components.Add(plugin);
+                //foreach (var plugin in types) components.Add(plugin);
+
 
             }
 
@@ -78,6 +83,25 @@ namespace Plugin.Shared
             }
         }
 
-        #endregion
+        private IEnumerable<IPluginComponent> CreatePlugin(Assembly assembly)
+        {
+            int count = 0;
+
+            foreach (Type type in assembly.GetTypes())
+            {
+                if (typeof(IPluginComponent).IsAssignableFrom(type))
+                {
+                    IPluginComponent result = Activator.CreateInstance(type) as IPluginComponent;
+                    if (result != null)
+                    {
+                        count++;
+                        yield return result;
+                    }
+                }
+            }
+
+
+            #endregion
+        }
     }
 }

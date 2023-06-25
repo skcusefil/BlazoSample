@@ -10,4 +10,9 @@
     <ProjectReference Include="..\Plugin.Shared\Plugin.Shared.csproj" />
   </ItemGroup>
 
+
+  <Target Name="CreatePluginDir" AfterTargets="PrepareForBuild">
+    <MakeDir Directories="$(OutDir)Plugins" Condition="!Exists('$(OutDir)Plugins')" />
+  </Target>
+
 </Project>

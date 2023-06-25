@@ -13,9 +13,11 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
-var assemDir = Environment.CurrentDirectory + "\\Plugins";
+string root = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+string pluginDir = Directory.GetDirectories(root).Where(x => x.Contains("Plugins")).FirstOrDefault();
 
-builder.Services.AddPluginService(assemDir);
+
+builder.Services.AddPluginService(pluginDir);
 
 var app = builder.Build();
 
@@ -30,13 +32,13 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
-app.UseFileServer(new FileServerOptions
-{
-    FileProvider = new PhysicalFileProvider(
-           Path.Combine(builder.Environment.ContentRootPath, "Plugins")),
-    RequestPath = "/Plugins",
-    EnableDirectoryBrowsing = false
-});
+//app.UseFileServer(new FileServerOptions
+//{
+//    FileProvider = new PhysicalFileProvider(
+//           Path.Combine(builder.Environment.ContentRootPath, "Plugins")),
+//    RequestPath = "/Plugins",
+//    EnableDirectoryBrowsing = false
+//});
 
 app.UseStaticFiles();
 
