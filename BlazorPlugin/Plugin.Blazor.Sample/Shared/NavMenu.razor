@@ -25,27 +25,30 @@
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
             </NavLink>
         </div>
-        @foreach (var menu in PluginMenuItems)
+        @foreach (var plugin in PluginComponents)
         {
             <div class="nav-item px-3">
-                <PluginMenuItem PageLink="@menu.PageName" MenuText="@menu.ButtonText"></PluginMenuItem>
+                <NavLink class="nav-link" href="@plugin.PageName">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> @plugin.MenuText
+                </NavLink>
             </div>
         }
     </nav>
 </div>
 
 @code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-    private IEnumerable<IPluginComponent> PluginMenuItems;
-
     [Inject]
     public IPluginService PluginService { get; set; }
 
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private IEnumerable<IPluginComponent> PluginComponents;
+
+
     protected override async Task OnInitializedAsync()
     {
-        PluginMenuItems = PluginService.GetComponents();
+        PluginComponents = PluginService.PluginComponents;
         await base.OnInitializedAsync();
     }
 

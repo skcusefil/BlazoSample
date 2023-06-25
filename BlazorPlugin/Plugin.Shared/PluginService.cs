@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -11,76 +14,90 @@ namespace Plugin.Shared
 {
     public class PluginService : IPluginService
     {
-        public IEnumerable<Type> Components { get; private set; }
-        public PluginService(string assemblyDir)
-        {
-            var rootDir = AppDomain.CurrentDomain.BaseDirectory;
-            string pluginDir = Directory.GetDirectories(rootDir).Where(x => x.Contains("Plugins")).FirstOrDefault();
+        public IEnumerable<IPluginComponent> PluginComponents { get; private set; }
 
-            string[] pluginFolders = Directory.GetDirectories(pluginDir); 
-            LoadComponents(pluginDir);
+        public string[] JavascriptPaths { get; private set; }
+
+        public PluginService()
+        {
+            var rootDir = GetDomainRoot();
+
+            string pluginDir = FindPluginRootFolder(rootDir);
+
+            string[] pluginFolders = GetSubPluginFolders(pluginDir);
+
+            var wwwroot = FindWWWRoot(pluginFolders);
+            JavascriptPaths = GetJavascriptPaths(wwwroot);
+            //get assembly from all plugin folders
+
+            var pluginComponents = new List<IPluginComponent>();
+
+            foreach (string pluginFolder in pluginFolders)
+            {
+                //Load Assembly
+                var assemblies = Directory.GetFiles(pluginFolder, "*.dll").Select(dll => Assembly.LoadFile(dll)).ToList();
+
+                foreach (var assembly in assemblies)
+                {
+                    //load assembly with context
+                    PluginLoadContext loadContext = new PluginLoadContext(assembly.Location);
+                    var pluginAssembly = loadContext.LoadFromAssemblyName(AssemblyName.GetAssemblyName(assembly.Location));
+                    var plugin = CreatePlugin(pluginAssembly);
+                    pluginComponents.AddRange(plugin);
+                }
+            }
+
+            PluginComponents = pluginComponents;
+
         }
 
-        public IEnumerable<IPluginComponent> GetComponents()
+        public void CreatePluginsServices(IServiceCollection services)
         {
-            return Components.Select(x => (IPluginComponent)Activator.CreateInstance(x)).ToList();
-        }
-
-        public IPluginComponent GetComponentByPageName(string pageName)
-        {
-            return Components.Select(x => (IPluginComponent)Activator.CreateInstance(x))
-            .SingleOrDefault(x => x.PageName == pageName);
+            foreach (var plugin in PluginComponents)
+            {
+                plugin.CreatePluginsServices(services);
+            }
         }
 
         #region private
 
-        //Load Components
-        private void LoadComponents(string path)
+        //Get App Domain root
+        private string GetDomainRoot()
         {
-
-            var components = new List<Type>();
-            var assemblies = LoadAssemblies(path);
-
-            foreach (var asm in assemblies)
-            {
-                PluginLoadContext loadContext = new PluginLoadContext(asm.Location);
-                var assembly = loadContext.LoadFromAssemblyName(AssemblyName.GetAssemblyName(asm.Location));
-
-                //var types = GetTypesWithInterface(assembly);
-
-                //foreach (var plugin in types) components.Add(plugin);
-
-
-            }
-
-            Components = components;
+            return AppDomain.CurrentDomain.BaseDirectory;
         }
 
-        //Load Assembly
-        private IEnumerable<Assembly> LoadAssemblies(string path)
+        //Find plugin Folders
+        private string FindPluginRootFolder(string rootDir)
         {
-            return Directory.GetFiles(path, "*.dll").Select(dll => Assembly.LoadFile(dll)).ToList();
+            return Directory.GetDirectories(rootDir).Where(x => x.Contains("Plugins")).FirstOrDefault();
         }
 
-        //Get Assembly from Interface
-        private IEnumerable<Type> GetTypesWithInterface(Assembly asm)
+        private string[] GetSubPluginFolders(string pluginDir)
         {
-            var it = typeof(IPluginComponent);
-            return GetLoadableTypes(asm).Where(it.IsAssignableFrom).ToList();
+            return Directory.GetDirectories(pluginDir);
         }
 
-        //Get Loadable Types
-        private IEnumerable<Type> GetLoadableTypes(Assembly assembly)
+        private string FindWWWRoot(string[] folders)
         {
-            if (assembly == null) throw new ArgumentNullException("assembly");
-            try
+            string wwwroot = "";
+
+            foreach (var folder in folders)
             {
-                return assembly.GetTypes();
+                wwwroot = Directory.GetDirectories(folder).Where(x => x.Contains("wwwroot")).FirstOrDefault();
             }
-            catch (ReflectionTypeLoadException e)
-            {
-                return e.Types.Where(t => t != null);
-            }
+            return wwwroot;
+        }
+
+        private string[] GetJavascriptPaths(string wwwroot)
+        {
+            return Directory.GetFiles(wwwroot, "*.js");
+
+        }
+
+        public IPluginComponent GetComponentByPageName(string pageName)
+        {
+            return PluginComponents.FirstOrDefault(x => x.PageName == pageName);
         }
 
         private IEnumerable<IPluginComponent> CreatePlugin(Assembly assembly)
@@ -99,9 +116,9 @@ namespace Plugin.Shared
                     }
                 }
             }
-
-
-            #endregion
         }
+
+        #endregion
+
     }
 }

@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Plugin.Shared;
 
 namespace PluginComponent
 {
@@ -12,11 +14,20 @@ namespace PluginComponent
     public class ExampleJsInterop : IAsyncDisposable
     {
         private readonly Lazy<Task<IJSObjectReference>> moduleTask;
-
-        public ExampleJsInterop(IJSRuntime jsRuntime)
+        public ExampleJsInterop(IJSRuntime jsRuntime, string JavascriptPaths, bool isPlugin, IPluginService PluginService)
         {
-            moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
-                "import", "./_content/PluginComponent/exampleJsInterop.js").AsTask());
+            if (!isPlugin)
+            {
+                moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
+    "import", "./_content/PluginComponent/exampleJsInterop.js").AsTask());
+            }
+            else
+            {
+                var path = PluginService.JavascriptPaths.Where(x => x.Contains(JavascriptPaths)).FirstOrDefault();
+                moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
+"import", path).AsTask());
+            }
+
         }
 
         public async ValueTask<string> Prompt(string message)

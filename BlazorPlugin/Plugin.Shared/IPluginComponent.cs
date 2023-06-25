@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,8 +12,11 @@ namespace Plugin.Shared
     public interface IPluginComponent
     {
         public Type ComponentType { get; }
-        public Dictionary<string,object> ComponentParameters { get; }
+        public IDictionary<string,object> ComponentParameters { get; }
         public string PageName { get; }
-        public string ButtonText { get; }
+        public string MenuText { get; }
+        void CreatePluginsServices(IServiceCollection services);
+        void CreatePluginApplicationBuilder(IApplicationBuilder app);
+
     }
 }

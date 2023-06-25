@@ -1,10 +1,26 @@
 ﻿@page "/pluginSample"
+@using Microsoft.JSInterop;
 @using Newtonsoft.Json;
+@using Plugin.Shared;
+@using global::PluginComponent.Services;
 <h3>PluginSample</h3>
+
+<img src="/Plugins/PluginComponent/wwwroot/QoP.jpg" />
+
+
+@SomeComponentService.HelloWorld();
 
 @JSon
 
 @code {
+    [Inject]
+    public ISomeComponentService SomeComponentService { get; set; }
+
+    [Parameter]
+    public string JavascriptPaths { get; set; }
+
+    [Parameter]
+    public bool IsPlugin { get; set; } = false;
 
     class Test
     {
@@ -22,8 +38,18 @@
                 Str = "somestring"
             };
 
-       JSon = JsonConvert.SerializeObject(test);
-       await base.OnInitializedAsync();
+        JSon = JsonConvert.SerializeObject(test);
+        await base.OnInitializedAsync();
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
 
 }

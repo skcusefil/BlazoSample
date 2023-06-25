@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.FileProviders;
 using Plugin.Blazor.Sample.Data;
 using Plugin.Shared;
@@ -8,18 +5,17 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
-string root = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-string pluginDir = Directory.GetDirectories(root).Where(x => x.Contains("Plugins")).FirstOrDefault();
+builder.Services.AddPluginServices();
 
-
-builder.Services.AddPluginService(pluginDir);
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -29,18 +25,24 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+//plugin
+app.UsePluginMiddleware();
+
+
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+//var root = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+
 //app.UseFileServer(new FileServerOptions
 //{
 //    FileProvider = new PhysicalFileProvider(
-//           Path.Combine(builder.Environment.ContentRootPath, "Plugins")),
+//           Path.Combine(root, "Plugins")),
 //    RequestPath = "/Plugins",
-//    EnableDirectoryBrowsing = false
+//    EnableDirectoryBrowsing = true
 //});
 
-app.UseStaticFiles();
 
 
 app.UseRouting();
