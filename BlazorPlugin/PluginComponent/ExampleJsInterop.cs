@@ -14,18 +14,15 @@ namespace PluginComponent
     public class ExampleJsInterop : IAsyncDisposable
     {
         private readonly Lazy<Task<IJSObjectReference>> moduleTask;
-        public ExampleJsInterop(IJSRuntime jsRuntime, string JavascriptPaths, bool isPlugin, IPluginService PluginService)
+        public ExampleJsInterop(IJSRuntime jsRuntime, bool isPlugin)
         {
             if (!isPlugin)
             {
-                moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
-    "import", "./_content/PluginComponent/exampleJsInterop.js").AsTask());
+                moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/PluginComponent/exampleJsInterop.js").AsTask());
             }
             else
             {
-                var path = PluginService.JavascriptPaths.Where(x => x.Contains(JavascriptPaths)).FirstOrDefault();
-                moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
-"import", path).AsTask());
+                moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>("import", "/Plugins/PluginComponent/wwwroot/exampleJsInterop.js").AsTask());
             }
 
         }

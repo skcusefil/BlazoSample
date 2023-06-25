@@ -24,6 +24,7 @@ namespace Plugin.Shared
         public static IApplicationBuilder UsePluginMiddleware(this IApplicationBuilder builder)
         {
             builder.UseStaticFiles();
+
             var root = AppDomain.CurrentDomain.BaseDirectory;
 
             builder.UseFileServer(new FileServerOptions

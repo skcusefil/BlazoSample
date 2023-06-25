@@ -14,10 +14,9 @@
 
 @code {
     [Inject]
+    public IJSRuntime JSRuntime { get; set; }
+    [Inject]
     public ISomeComponentService SomeComponentService { get; set; }
-
-    [Parameter]
-    public string JavascriptPaths { get; set; }
 
     [Parameter]
     public bool IsPlugin { get; set; } = false;
@@ -46,10 +45,10 @@
     {
         if (firstRender)
         {
-
+            var interop = new ExampleJsInterop(JSRuntime, IsPlugin);
+            interop.Prompt("string test");
         }
         await base.OnAfterRenderAsync(firstRender);
     }
-
 
 }

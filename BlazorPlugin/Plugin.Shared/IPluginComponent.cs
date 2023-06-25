@@ -16,7 +16,5 @@ namespace Plugin.Shared
         public string PageName { get; }
         public string MenuText { get; }
         void CreatePluginsServices(IServiceCollection services);
-        void CreatePluginApplicationBuilder(IApplicationBuilder app);
-
     }
 }

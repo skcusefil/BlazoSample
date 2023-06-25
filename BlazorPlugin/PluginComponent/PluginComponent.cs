@@ -20,19 +20,12 @@ namespace PluginComponent
         public IDictionary<string, object> ComponentParameters => 
             new Dictionary<string, object>()
             {
-                { "JavascriptPaths", "exampleJsInterop.js" },
                 {"IsPlugin", true }
             };
 
         public string PageName => "pluginSample";
 
         public string MenuText => "Plugin Sample";
-
-        public void CreatePluginApplicationBuilder(IApplicationBuilder app)
-        {
-            app.UseStaticFiles();
-
-        }
 
         public void CreatePluginsServices(IServiceCollection services)
         {
