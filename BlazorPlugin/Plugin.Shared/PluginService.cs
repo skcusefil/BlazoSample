@@ -16,8 +16,6 @@ namespace Plugin.Shared
     {
         public IEnumerable<IPluginComponent> PluginComponents { get; private set; }
 
-        public string[] JavascriptPaths { get; private set; }
-
         public PluginService()
         {
             var rootDir = GetDomainRoot();
@@ -27,7 +25,7 @@ namespace Plugin.Shared
             string[] pluginFolders = GetSubPluginFolders(pluginDir);
 
             var wwwroot = FindWWWRoot(pluginFolders);
-            JavascriptPaths = GetJavascriptPaths(wwwroot);
+
             //get assembly from all plugin folders
 
             var pluginComponents = new List<IPluginComponent>();

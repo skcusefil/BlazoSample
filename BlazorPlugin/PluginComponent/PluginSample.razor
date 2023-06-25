@@ -10,9 +10,13 @@
 
 @SomeComponentService.HelloWorld();
 
-@JSon
+<div class=some-css-class>
+    Here is some style from plugin component<br />
+    @JSon : this one is from JSON Dependency
+</div>
 
 @code {
+
     [Inject]
     public IJSRuntime JSRuntime { get; set; }
     [Inject]
@@ -46,7 +50,14 @@
         if (firstRender)
         {
             var interop = new ExampleJsInterop(JSRuntime, IsPlugin);
-            interop.Prompt("string test");
+            await interop.Prompt("string test");
+
+
+            if (IsPlugin)
+            {
+                var loadCSS = new ComponentStyleInterop(JSRuntime);
+                await loadCSS.LoadStyle();
+            }
         }
         await base.OnAfterRenderAsync(firstRender);
     }
